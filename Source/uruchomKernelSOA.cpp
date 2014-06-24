@@ -25,7 +25,7 @@ void uruchomKernel(boost::shared_ptr<ClKernel> kernel,
     daneTestoweGpu[5]->copyOut(wynikiZ, 0, c_N*sizeof(float));
 }
 
-uint testujKernel(ClKernelFromSourceLoader* kernelLoader, float** daneTesoweCpu, vector<ClMemory*>& daneTestoweGpu, string fileName, string kernelName, uint globalSize, uint localSize)
+int testujKernel(ClKernelFromSourceLoader* kernelLoader, float** daneTesoweCpu, vector<ClMemory*>& daneTestoweGpu, string fileName, string kernelName, uint globalSize, uint localSize)
 {
     boost::shared_ptr<ClKernel> kernel = kernelLoader->loadKernel(fileName.c_str(), kernelName.c_str());
 

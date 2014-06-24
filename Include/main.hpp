@@ -25,4 +25,4 @@ void uruchomKernel(boost::shared_ptr<ClKernel> kernel,
 		   float* wynikiY,
 		   float* wynikiZ  );
 int zmierzCzas( boost::function<void()> funkcja );
-uint testujKernel(ClKernelFromSourceLoader*, float**, vector<ClMemory*>&, string, string, uint globalSize = 256, uint localSize = 256);
+int testujKernel(ClKernelFromSourceLoader*, float**, vector<ClMemory*>&, string, string, uint globalSize = 256, uint localSize = 256);

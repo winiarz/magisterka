@@ -1,8 +1,5 @@
 #include "main.hpp"
 
-float* daneTesoweCpu[6];
-vector<ClMemory*> daneTestoweGpu;
-
 ClKernelFromSourceLoader* kernelLoader;
 
 void przygotujKompilator()
@@ -15,6 +12,8 @@ void przygotujKompilator()
 
 int main(int argc, const char* argv[])
 {
+    float* daneTesoweCpu[6];
+    vector<ClMemory*> daneTestoweGpu;
     cout << "przygotowanie danych do testow" << endl;
 
     przygotujDaneTestowe(daneTesoweCpu, daneTestoweGpu);
@@ -27,11 +26,16 @@ int main(int argc, const char* argv[])
     cout << "Testowanie kerneli:" << endl;
     przygotujKompilator();
 
-    testujKernel(kernelLoader, daneTesoweCpu, daneTestoweGpu, "clinclude/simplest_nbody.cl","simplestNbody");
-    testujKernel(kernelLoader, daneTesoweCpu, daneTestoweGpu, "clinclude/simplest2.cl","simplestNbody2");
-    
-    testujKernel(kernelLoader, daneTesoweCpu, daneTestoweGpu, "clinclude/nbody_float4.cl","nbody_float4");
-    testujKernel(kernelLoader, daneTesoweCpu, daneTestoweGpu, "clinclude/nbody.cl","nbody_withSharedMem");
-    testujKernel(kernelLoader, daneTesoweCpu, daneTestoweGpu, "clinclude/nbody2_float4.cl","nbody2_float4");
+    int czasGPU;
+    czasGPU = testujKernel(kernelLoader, daneTesoweCpu, daneTestoweGpu, "clinclude/simplest_nbody.cl","simplestNbody");
+    cout << "Przycpieszenie: " << (czasCPU / czasGPU ) << endl;
+    czasGPU = testujKernel(kernelLoader, daneTesoweCpu, daneTestoweGpu, "clinclude/simplest2.cl","simplestNbody2");
+    cout << "Przycpieszenie: " << (czasCPU / czasGPU ) << endl;
+    czasGPU = testujKernel(kernelLoader, daneTesoweCpu, daneTestoweGpu, "clinclude/nbody_float4.cl","nbody_float4");
+    cout << "Przycpieszenie: " << (czasCPU / czasGPU ) << endl;
+    czasGPU = testujKernel(kernelLoader, daneTesoweCpu, daneTestoweGpu, "clinclude/nbody.cl","nbody_withSharedMem");
+    cout << "Przycpieszenie: " << (czasCPU / czasGPU ) << endl;
+    czasGPU = testujKernel(kernelLoader, daneTesoweCpu, daneTestoweGpu, "clinclude/nbody2_float4.cl","nbody2_float4");
+    cout << "Przycpieszenie: " << (czasCPU / czasGPU ) << endl;
 }
 
