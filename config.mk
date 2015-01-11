@@ -20,5 +20,5 @@ libClPlatform=$(Lib)/ClPlatform.a
 cpp_flags=-c -Wall -Werror
 
 #external libraries
-OpenClLib= -lpthread /usr/lib/libOpenCL.so.1
+OpenClLib= -lpthread /usr/lib/x86_64-linux-gnu/libOpenCL.so.1
 OpenGL=-lGL -lGLU -lGLEW 

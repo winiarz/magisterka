@@ -11,8 +11,6 @@ ClKernelFromSourceLoader::ClKernelFromSourceLoader(std::set<std::string> p_inclu
 
 boost::shared_ptr<ClKernel> ClKernelFromSourceLoader::loadKernel(std::string filename, std::string kernelName)
 {
-    std::cout << "Kompilacja kernela " << kernelName << "z pliku: " << filename << std::endl;
-
     boost::shared_ptr<std::string> source = readFile(filename);
 
     boost::shared_ptr<std::string> sourceWithReplacedIncludes = includePreprocessor.replaceIncludes(source, includeDirectories);

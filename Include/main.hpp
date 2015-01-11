@@ -23,6 +23,34 @@ void uruchomKernel(boost::shared_ptr<ClKernel> kernel,
 		   vector<ClMemory*>& daneTestoweGpu,
 		   float* wynikiX,
 		   float* wynikiY,
-		   float* wynikiZ  );
+		   float* wynikiZ );
 int zmierzCzas( boost::function<void()> funkcja );
-int testujKernel(ClKernelFromSourceLoader*, float**, vector<ClMemory*>&, string, string, uint globalSize = 256, uint localSize = 256);
+int testujKernel(ClKernelFromSourceLoader*,
+                 float**,
+                 vector<ClMemory*>&,
+                 string, string,
+                 bool checkResults,
+                 bool printOnlyTimes,
+                 uint globalSize = 32,
+                 uint localSize = 64);
+
+int testujKernelSOA(ClKernelFromSourceLoader* kernelLoader,
+                    float** daneTesoweCpu,
+                    string fileName,
+                    string kernelName,
+                    bool checkResults,
+                    bool printOnlyTimes,
+                    uint globalSize = 32,
+                    uint localSize = 64);
+
+const float posMin = -100.0f;
+const float posMax = -posMin;
+const float velMin = -1.0f;
+const float velMax = -velMin;
+const float massMin = 1.0f;
+const float massMax = 10.0f;
+
+const float dopuszczalnyBlad = 0.05;
+const int maxBledow = 10;
+
+

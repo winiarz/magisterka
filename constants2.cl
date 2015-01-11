@@ -1,5 +1,5 @@
 
-#define NN ((1<<14) * 32 )
+#define NN ((1<<14) * NUMBER )
 __constant uint c_N = NN;
 __constant uint c_N4 = NN/4;
 __constant uint c_N8 = NN/8;

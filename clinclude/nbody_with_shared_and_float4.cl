@@ -1,5 +1,5 @@
 #include "constants.cl"
-__constant const uint LOCAL_SIZE = 1024;
+__constant const uint PRIVATE_SIZE = 1024;
 
 
 __kernel void with_shared_and_float4( __global float* g_X,  __global float* g_Y,  __global float* g_Z,
@@ -16,19 +16,19 @@ __kernel void with_shared_and_float4( __global float* g_X,  __global float* g_Y,
     __global float4* ny = (__global float4*) g_Y;
     __global float4* nz = (__global float4*) g_Z;
 
-    __local float l_X[LOCAL_SIZE];
-    __local float l_Y[LOCAL_SIZE];
-    __local float l_Z[LOCAL_SIZE];
+    __local float l_X[PRIVATE_SIZE];
+    __local float l_Y[PRIVATE_SIZE];
+    __local float l_Z[PRIVATE_SIZE];
 
-    __local float l_rX[LOCAL_SIZE];
-    __local float l_rY[LOCAL_SIZE];
-    __local float l_rZ[LOCAL_SIZE];
+    __local float l_rX[PRIVATE_SIZE];
+    __local float l_rY[PRIVATE_SIZE];
+    __local float l_rZ[PRIVATE_SIZE];
 
 
-    for( uint r_k=0; r_k<c_N/(LOCAL_SIZE*r_groupSize); r_k++)
+    for( uint r_k=0; r_k<c_N/(PRIVATE_SIZE*r_groupSize); r_k++)
     {
-        uint r_offset = LOCAL_SIZE*r_group + r_k*r_groupSize*LOCAL_SIZE;
-        for( uint r_i=r_lid; r_i < LOCAL_SIZE; r_i+=r_lsize)
+        uint r_offset = PRIVATE_SIZE*r_group + r_k*r_groupSize*PRIVATE_SIZE;
+        for( uint r_i=r_lid; r_i < PRIVATE_SIZE; r_i+=r_lsize)
         {
             l_X[r_i] = g_X[r_i + r_offset];
             l_Y[r_i] = g_Y[r_i + r_offset];
@@ -45,7 +45,7 @@ __kernel void with_shared_and_float4( __global float* g_X,  __global float* g_Y,
             float4 r_y = ny[r_j];
             float4 r_z = nz[r_j];
         
-            for( uint r_i=r_lid; r_i < LOCAL_SIZE; r_i+=r_lsize)
+            for( uint r_i=r_lid; r_i < PRIVATE_SIZE; r_i+=r_lsize)
             {
                 float4 r_dx = l_X[r_i] - r_x;
                 float4 r_dy = l_Y[r_i] - r_y;
@@ -65,7 +65,7 @@ __kernel void with_shared_and_float4( __global float* g_X,  __global float* g_Y,
 
         }
 
-        for( uint r_i=r_lid; r_i < LOCAL_SIZE; r_i+=r_lsize)
+        for( uint r_i=r_lid; r_i < PRIVATE_SIZE; r_i+=r_lsize)
         {
             g_rX[r_i + r_offset] = c_G * l_rX[r_i];
             g_rY[r_i + r_offset] = c_G * l_rY[r_i];

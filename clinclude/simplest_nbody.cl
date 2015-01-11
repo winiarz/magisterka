@@ -1,7 +1,7 @@
 #include "constants.cl"
 
 __kernel void simplestNbody( __global float* g_X,  __global float* g_Y,  __global float* g_Z,
-                             __global float* g_rX, __global float* g_rY, __global float* g_rZ )
+                             __global float* g_oX, __global float* g_oY, __global float* g_oZ )
 {
     uint r_gid = get_global_id(0);
 	uint r_gsize = get_global_size(0);

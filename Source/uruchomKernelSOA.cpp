@@ -4,49 +4,67 @@ float zera[c_N];
 
 void zerujWyniki(vector<ClMemory*>& daneTestoweGpu)
 {
-    daneTestoweGpu[3]->copyIn(zera, 0, c_N*sizeof(float));
-    daneTestoweGpu[4]->copyIn(zera, 0, c_N*sizeof(float));
-    daneTestoweGpu[5]->copyIn(zera, 0, c_N*sizeof(float));
+    daneTestoweGpu[6]->copyIn(zera, 0, c_N*sizeof(float));
+    daneTestoweGpu[7]->copyIn(zera, 0, c_N*sizeof(float));
+    daneTestoweGpu[8]->copyIn(zera, 0, c_N*sizeof(float));
 }
 
 void uruchomKernel(boost::shared_ptr<ClKernel> kernel,
 		   uint globalSize,
-		   uint loaclSize,
+		   uint localSize,
 		   vector<ClMemory*>& daneTestoweGpu,
 		   float* wynikiX,
 		   float* wynikiY,
 		   float* wynikiZ  )
 {
     zerujWyniki(daneTestoweGpu);
-    (*kernel)[globalSize][loaclSize](daneTestoweGpu);
+    (*kernel)[globalSize][localSize](daneTestoweGpu);
     
-    daneTestoweGpu[3]->copyOut(wynikiX, 0, c_N*sizeof(float));
-    daneTestoweGpu[4]->copyOut(wynikiY, 0, c_N*sizeof(float));
-    daneTestoweGpu[5]->copyOut(wynikiZ, 0, c_N*sizeof(float));
+    daneTestoweGpu[6]->copyOut(wynikiX, 0, c_N*sizeof(float));
+    daneTestoweGpu[7]->copyOut(wynikiY, 0, c_N*sizeof(float));
+    daneTestoweGpu[8]->copyOut(wynikiZ, 0, c_N*sizeof(float));
 }
 
-int testujKernel(ClKernelFromSourceLoader* kernelLoader, float** daneTesoweCpu, vector<ClMemory*>& daneTestoweGpu, string fileName, string kernelName, uint globalSize, uint localSize)
+int testujKernel(ClKernelFromSourceLoader* kernelLoader,
+                 float** daneTesoweCpu,
+                 vector<ClMemory*>& daneTestoweGpu,
+                 string fileName,
+                 string kernelName,
+                 bool checkResults,
+                 bool printOnlyTimes,
+                 uint globalSize,
+                 uint localSize)
 {
     boost::shared_ptr<ClKernel> kernel = kernelLoader->loadKernel(fileName.c_str(), kernelName.c_str());
-
-    float wynikiX[c_N];
-    float wynikiY[c_N];
-    float wynikiZ[c_N];
+    vector<float> wynikiX(c_N);
+    vector<float> wynikiY(c_N);
+    vector<float> wynikiZ(c_N);
     
-    cout << "uruchomienie kernla: " << kernelName << endl;
+    if (!printOnlyTimes) 
+        cout << "uruchomienie kernla: " << kernelName << endl;
     int workTime = zmierzCzas( boost::bind( &uruchomKernel,
 					    kernel,
 					    globalSize,
 					    localSize,
 					    daneTestoweGpu,
-					    wynikiX,
-					    wynikiY,
-					    wynikiZ ) );
+					    &wynikiX.front(),
+					    &wynikiY.front(),
+					    &wynikiZ.front() ) );
 
-    cout << "kernel " << kernelName << " czas: " << workTime << endl;
+    if (!printOnlyTimes) 
+        cout << "kernel " << kernelName << " czas: " << workTime << endl;
+    else
+        cout << workTime << endl;
 
-    if( sprawdzWyniki(wynikiX, wynikiY, wynikiZ, daneTesoweCpu ) )
-      return 0xffffffff;
+    if ( checkResults ) 
+    {
+        if( !sprawdzWyniki(&wynikiX.front(),
+                           &wynikiY.front(),
+                           &wynikiZ.front(),
+                           daneTesoweCpu ) )
+            return 0xffffffff;
+    }
 
     return workTime;
+    //return 1;
 }

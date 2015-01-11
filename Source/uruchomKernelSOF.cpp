@@ -4,7 +4,7 @@ float zera[c_N];
 
 void zerujWyniki(vector<ClMemory*>& daneTestoweGpu)
 {
-    daneTestoweGpu[3]->copyIn(zera, 0, c_N*sizeof(float));
-    daneTestoweGpu[4]->copyIn(zera, 0, c_N*sizeof(float));
-    daneTestoweGpu[5]->copyIn(zera, 0, c_N*sizeof(float));
+    daneTestoweGpu[6]->copyIn(zera, 0, c_N*sizeof(float));
+    daneTestoweGpu[7]->copyIn(zera, 0, c_N*sizeof(float));
+    daneTestoweGpu[8]->copyIn(zera, 0, c_N*sizeof(float));
 }
