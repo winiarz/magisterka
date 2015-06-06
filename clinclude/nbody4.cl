@@ -3,10 +3,10 @@
 __constant const uint LOCAL_SIZE = 256;
 
 
-__kernel void nbody_withSharedMem( __global float* g_X,  __global float* g_Y,  __global float* g_Z,
-                                   __global float* g_oX, __global float* g_oY, __global float* g_oZ,
-                                   __global float* g_nX, __global float* g_nY, __global float* g_nZ,
-                                   __global float* g_m )
+__kernel void nbody_withSharedMem4( __global float* g_X,  __global float* g_Y,  __global float* g_Z,
+                                    __global float* g_oX, __global float* g_oY, __global float* g_oZ,
+                                    __global float* g_nX, __global float* g_nY, __global float* g_nZ,
+                                    __global float* g_m )
 {
     uint r_group = get_global_id(0) / get_local_size(0);
     uint r_groupSize = get_global_size(0) / get_local_size(0);
@@ -37,7 +37,6 @@ __kernel void nbody_withSharedMem( __global float* g_X,  __global float* g_Y,  _
         
         uint r_offset = LOCAL_SIZE*r_group + r_k*r_groupSize*LOCAL_SIZE;
 
-        //uint r_i=get_local_id(0);
         for( uint r_i=get_local_id(0); r_i < LOCAL_SIZE; r_i+=get_local_size(0))
         {
             l_X[r_i] = g_x4[r_i + r_offset];
@@ -49,13 +48,12 @@ __kernel void nbody_withSharedMem( __global float* g_X,  __global float* g_Y,  _
             l_rZ[r_i] = 0.0f;
         }
 
-        for( uint r_j=0; r_j<c_N4; r_j++)
+        for( uint r_j=0; r_j<c_N; r_j++)
         {
             float r_x = g_X[r_j];
             float r_y = g_Y[r_j];
             float r_z = g_Z[r_j];
 
-            //for( uint r_i=get_local_id(0); r_i < LOCAL_SIZE; r_i+=get_local_size(0))
             {
                 float4 r_dx = l_X[get_local_id(0)] - r_x;
                 float4 r_dy = l_Y[get_local_id(0)] - r_y;
@@ -63,15 +61,15 @@ __kernel void nbody_withSharedMem( __global float* g_X,  __global float* g_Y,  _
 
                 float4 r_dist_sq = r_dx*r_dx + r_dy*r_dy + r_dz*r_dz + c_Epsilon;
                 float4 r_dist = sqrt( r_dist_sq);
-                float4 r_dist_minus3 = g_m4[r_j] / ( r_dist_sq * r_dist );
+                float4 r_dist_minus3 = g_m[r_j] / ( r_dist_sq * r_dist );
                 
                 r_dx *= r_dist_minus3;
                 r_dy *= r_dist_minus3;
                 r_dz *= r_dist_minus3;
 
-                l_rX[get_local_id(0)] += r_dx.x + r_dx.y + r_dx.z + r_dx.w;
-                l_rY[get_local_id(0)] += r_dy.x + r_dy.y + r_dy.z + r_dy.w;
-                l_rZ[get_local_id(0)] += r_dz.x + r_dz.y + r_dz.z + r_dz.w;
+                l_rX[get_local_id(0)] += r_dx;//.x + r_dx.y + r_dx.z + r_dx.w;
+                l_rY[get_local_id(0)] += r_dy;//.x + r_dy.y + r_dy.z + r_dy.w;
+                l_rZ[get_local_id(0)] += r_dz;//.x + r_dz.y + r_dz.z + r_dz.w;
             }
 
             {
@@ -82,15 +80,15 @@ __kernel void nbody_withSharedMem( __global float* g_X,  __global float* g_Y,  _
 
                 float4 r_dist_sq = r_dx*r_dx + r_dy*r_dy + r_dz*r_dz + c_Epsilon;
                 float4 r_dist = sqrt( r_dist_sq);
-                float4 r_dist_minus3 = g_m4[r_j] / ( r_dist_sq * r_dist );
+                float4 r_dist_minus3 = g_m[r_j] / ( r_dist_sq * r_dist );
                 
                 r_dx *= r_dist_minus3;
                 r_dy *= r_dist_minus3;
                 r_dz *= r_dist_minus3;
 
-                l_rX[r_i] += r_dx.x + r_dx.y + r_dx.z + r_dx.w;
-                l_rY[r_i] += r_dy.x + r_dy.y + r_dy.z + r_dy.w;
-                l_rZ[r_i] += r_dz.x + r_dz.y + r_dz.z + r_dz.w;
+                l_rX[r_i] += r_dx;//.x + r_dx.y + r_dx.z + r_dx.w;
+                l_rY[r_i] += r_dy;//.x + r_dy.y + r_dy.z + r_dy.w;
+                l_rZ[r_i] += r_dz;//.x + r_dz.y + r_dz.z + r_dz.w;
             }
 
             {
@@ -101,15 +99,15 @@ __kernel void nbody_withSharedMem( __global float* g_X,  __global float* g_Y,  _
 
                 float4 r_dist_sq = r_dx*r_dx + r_dy*r_dy + r_dz*r_dz + c_Epsilon;
                 float4 r_dist = sqrt( r_dist_sq);
-                float4 r_dist_minus3 = g_m4[r_j] / ( r_dist_sq * r_dist );
+                float4 r_dist_minus3 = g_m[r_j] / ( r_dist_sq * r_dist );
                 
                 r_dx *= r_dist_minus3;
                 r_dy *= r_dist_minus3;
                 r_dz *= r_dist_minus3;
 
-                l_rX[r_i] += r_dx.x + r_dx.y + r_dx.z + r_dx.w;
-                l_rY[r_i] += r_dy.x + r_dy.y + r_dy.z + r_dy.w;
-                l_rZ[r_i] += r_dz.x + r_dz.y + r_dz.z + r_dz.w;
+                l_rX[r_i] += r_dx;//.x + r_dx.y + r_dx.z + r_dx.w;
+                l_rY[r_i] += r_dy;//.x + r_dy.y + r_dy.z + r_dy.w;
+                l_rZ[r_i] += r_dz;//.x + r_dz.y + r_dz.z + r_dz.w;
             }
 
             {
@@ -120,15 +118,15 @@ __kernel void nbody_withSharedMem( __global float* g_X,  __global float* g_Y,  _
 
                 float4 r_dist_sq = r_dx*r_dx + r_dy*r_dy + r_dz*r_dz + c_Epsilon;
                 float4 r_dist = sqrt( r_dist_sq);
-                float4 r_dist_minus3 = g_m4[r_j] / ( r_dist_sq * r_dist );
+                float4 r_dist_minus3 = g_m[r_j] / ( r_dist_sq * r_dist );
                 
                 r_dx *= r_dist_minus3;
                 r_dy *= r_dist_minus3;
                 r_dz *= r_dist_minus3;
 
-                l_rX[r_i] += r_dx.x + r_dx.y + r_dx.z + r_dx.w;
-                l_rY[r_i] += r_dy.x + r_dy.y + r_dy.z + r_dy.w;
-                l_rZ[r_i] += r_dz.x + r_dz.y + r_dz.z + r_dz.w;
+                l_rX[r_i] += r_dx;//.x + r_dx.y + r_dx.z + r_dx.w;
+                l_rY[r_i] += r_dy;//.x + r_dy.y + r_dy.z + r_dy.w;
+                l_rZ[r_i] += r_dz;//.x + r_dz.y + r_dz.z + r_dz.w;
             }
 
         }

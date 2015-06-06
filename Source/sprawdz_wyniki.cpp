@@ -8,18 +8,21 @@ int sprawdzWyniki(float* wynikiX, float* wynikiY, float* wynikiZ, float** daneTe
         if ( fabs(wynikiX[i] - daneTesoweCpu[6][i]) > dopuszczalnyBlad ) 
         {
             cout << "Nieprawidlowy wynik!: X[" << i << "] = " << wynikiX[i] << " a powien byc " << daneTesoweCpu[6][i] << endl;
+            cout << "blad = " << fabs(wynikiX[i] - daneTesoweCpu[6][i]) << " > " << dopuszczalnyBlad << endl;
             iloscBledow++;
         }
         
         if ( fabs(wynikiY[i] - daneTesoweCpu[7][i]) > dopuszczalnyBlad ) 
         {
             cout << "Nieprawidlowy wynik!: Y[" << i << "] = " << wynikiY[i] << " a powien byc " << daneTesoweCpu[7][i] << endl;
+            cout << "blad = " << fabs(wynikiY[i] - daneTesoweCpu[7][i]) << " > " << dopuszczalnyBlad << endl;
             iloscBledow++;
         }
         
         if ( fabs(wynikiZ[i] - daneTesoweCpu[8][i]) > dopuszczalnyBlad ) 
         {
             cout << "Nieprawidlowy wynik!: Z[" << i << "] = " << wynikiZ[i] << " a powien byc " << daneTesoweCpu[8][i] << endl;
+            cout << "blad = " << fabs(wynikiZ[i] - daneTesoweCpu[8][i]) << " > " << dopuszczalnyBlad << endl;
             iloscBledow++;
         }
 

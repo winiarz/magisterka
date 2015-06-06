@@ -42,9 +42,9 @@ void nbody_cpu(float** dane)
             silaZ += masy[j] * odleglosc_z / ( odleglosc * odleglosc_sq );
         }
 
-        wyniki[0][i] = 2.0f * polozenia[0][i] - starePolozenia[0][i] + c_G * silaX * c_delta_t *c_delta_t;
-        wyniki[1][i] = 2.0f * polozenia[1][i] - starePolozenia[1][i] + c_G * silaY * c_delta_t *c_delta_t;
-        wyniki[2][i] = 2.0f * polozenia[2][i] - starePolozenia[2][i] + c_G * silaZ * c_delta_t *c_delta_t;
+        wyniki[0][i] = 2.0f * polozenia[0][i] - starePolozenia[0][i] + c_G * silaX;// * c_delta_t *c_delta_t;
+        wyniki[1][i] = 2.0f * polozenia[1][i] - starePolozenia[1][i] + c_G * silaY;// * c_delta_t *c_delta_t;
+        wyniki[2][i] = 2.0f * polozenia[2][i] - starePolozenia[2][i] + c_G * silaZ;// * c_delta_t *c_delta_t;
 
         //cout << "END!! " << i << omp_get_thread_num() << endl;
     }

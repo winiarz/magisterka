@@ -43,6 +43,15 @@ int testujKernelSOA(ClKernelFromSourceLoader* kernelLoader,
                     uint globalSize = 32,
                     uint localSize = 64);
 
+int testujKernelSOAOV(ClKernelFromSourceLoader* kernelLoader,
+                      float** daneTesoweCpu,
+                      string fileName,
+                      string kernelName,
+                      bool checkResults,
+                      bool printOnlyTimes,
+                      uint globalSize=32,
+                      uint localSize=64);
+
 const float posMin = -100.0f;
 const float posMax = -posMin;
 const float velMin = -1.0f;
@@ -50,7 +59,7 @@ const float velMax = -velMin;
 const float massMin = 1.0f;
 const float massMax = 10.0f;
 
-const float dopuszczalnyBlad = 0.05;
+const float dopuszczalnyBlad = 0.01;
 const int maxBledow = 10;
 
 

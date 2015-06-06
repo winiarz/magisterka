@@ -17,7 +17,8 @@ include $(Makefiles)/IncludeDirectories.mk
 libClPlatform=$(Lib)/ClPlatform.a
 
 #compilers and their flags
-cpp_flags=-c -Wall -Werror
+cpp_flags=-c --std=c++11
+#-Wall -Werror
 
 #external libraries
 OpenClLib= -lpthread /usr/lib/x86_64-linux-gnu/libOpenCL.so.1

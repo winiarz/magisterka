@@ -21,6 +21,11 @@ nbodyProjectObj +=Obj/sprawdz_wyniki.o
 nbodyProjectObj +=Obj/zmierzCzas.o
 nbodyProjectObj +=Obj/uruchomKernelSOA.o
 nbodyProjectObj +=Obj/uruchomKernelAOS.o
+nbodyProjectObj +=Obj/uruchomKernel3.o
+nbodyProjectObj +=Obj/KernelTest.o
+nbodyProjectObj +=Obj/KernelTestSOA.o
+nbodyProjectObj +=Obj/KernelTestAOS.o
+nbodyProjectObj +=Obj/KernelTestSoAoV.o
 
 nbodyProject: $(nbodyProjectObj) $(libClPlatform)
 	@echo "\tLD\tnbodyProject"

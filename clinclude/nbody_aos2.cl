@@ -1,142 +1,14 @@
 #include "point.cl"
 #include "constants.cl"
 
-__kernel void nbody_aos1(__global struct point* points)
-{
-    for (uint i=get_global_id(0); i<c_N; i+=get_global_size(0))
-    {
-        struct point current = points[i];
-
-        float4 force = 0.0f;
-        for (uint j=0; j<c_N; ++j) 
-        {
-            struct point current2 = points[j];
-            float4 sub = current.positionMass - current2.positionMass;
-            float4 sub_sq = sub * sub;
-            float dist_sq = sub_sq.x + sub_sq.y + sub_sq.z + c_Epsilon;
-            float dist = sqrt(dist_sq);
-
-            force += (current2.positionMass.w * sub) / ( dist * dist_sq );
-        }
-
-        points[i].newPosition = 2.0f * current.positionMass - current.oldPosition + c_G * force;// * c_delta_t * c_delta_t;
-    }
-}
-
-__kernel void nbody_aos2(__global struct point* points)
-{
-    for (uint i=get_global_id(0); i<c_N; i+=2*get_global_size(0))
-    {
-        float4 positionMass = points[i].positionMass;
-        float4 positionMass2 = points[i+get_global_size(0)].positionMass;
-
-        float4 force = 0.0f;
-        float4 force2 = 0.0f;
-
-        for (uint j=0; j<c_N; ++j) 
-        {
-            float4 secondPositionMass = points[j].positionMass;
-
-            {
-                float4 sub = positionMass - secondPositionMass;
-                float4 sub_sq = sub * sub;
-                float dist_sq = sub_sq.x + sub_sq.y + sub_sq.z + c_Epsilon;
-                float dist = sqrt(dist_sq);
-
-                force += (secondPositionMass.w * sub) / ( dist * dist_sq );
-            }
-
-            {
-                float4 sub = positionMass2 - secondPositionMass;
-                float4 sub_sq = sub * sub;
-                float dist_sq = sub_sq.x + sub_sq.y + sub_sq.z + c_Epsilon;
-                float dist = sqrt(dist_sq);
-
-                force2 += (secondPositionMass.w * sub) / ( dist * dist_sq );
-            }
-        }
-
-        points[i].newPosition =
-            2.0f * positionMass - points[i].oldPosition + c_G * force;
-        points[i+get_global_size(0)].newPosition =
-            2.0f * positionMass2 - points[i+get_global_size(0)].oldPosition + c_G;
-    }
-}
-
 
 __constant const uint LOCAL_SIZE = 256;
-
-__kernel void nbody_aos3(__global struct point* points)
-{
-    __local float4 positionMass[LOCAL_SIZE];
-    float4 force[4];
-
-    for (uint i=get_global_id(0); i<c_N; i+=4*get_global_size(0))
-    {
-        for (uint l=0;l<4;l++) 
-        {
-            force[l] = 0.0f;
-            positionMass[get_local_id(0) + l*get_local_size(0)] = points[i+l*get_global_size(0)].positionMass;
-        }
-
-        for (uint j=0; j<c_N; ++j) 
-        {
-            float4 secondPositionMass = points[j].positionMass;
-            float4 dist_sq;
-            uint l = get_local_id(0);
-
-            float4 sub1 = positionMass[l] - secondPositionMass;
-            {
-                float4 sub_sq = sub1 * sub1;
-                dist_sq.x = sub_sq.x + sub_sq.y + sub_sq.z + c_Epsilon;
-            }
-
-            l+=get_local_size(0);
-            float4 sub2 = positionMass[l] - secondPositionMass;
-            {
-                float4 sub_sq = sub2 * sub2;
-                dist_sq.y = sub_sq.x + sub_sq.y + sub_sq.z + c_Epsilon;
-            }
-
-            l+=get_local_size(0);
-            float4 sub3 = positionMass[l] - secondPositionMass;
-            {
-                float4 sub_sq = sub3 * sub3;
-                dist_sq.z = sub_sq.x + sub_sq.y + sub_sq.z + c_Epsilon;
-            }
-
-            l+=get_local_size(0);
-            float4 sub4 = positionMass[l] - secondPositionMass;
-            {
-                float4 sub_sq = sub4 * sub4;
-                dist_sq.w = sub_sq.x + sub_sq.y + sub_sq.z + c_Epsilon;
-            }
-
-            dist_sq *= sqrt(dist_sq);
-
-            force[0] += (secondPositionMass.w * sub1) / ( dist_sq.x );
-            force[1] += (secondPositionMass.w * sub2) / ( dist_sq.y );
-            force[2] += (secondPositionMass.w * sub3) / ( dist_sq.z );
-            force[3] += (secondPositionMass.w * sub4) / ( dist_sq.w );
-        }
-
-        for (uint l=0;l<4;l++)
-        {
-            points[i+l*get_global_size(0)].newPosition =
-                2.0f * positionMass[get_local_id(0) + l*get_local_size(0)] -
-                points[i+l*get_global_size(0)].oldPosition +
-                c_G * force[l];
-        }
-    }
-}
-
-//__constant const uint LOCAL_SIZE = 256;
 __constant const uint PRIVATE_SIZE = 4;
 
 __kernel void nbody_aos4(__global struct point* g_points)
 {
-    //uint r_group = get_global_id(0) / get_local_size(0);
-    //uint r_groupSize = get_global_size(0) / get_local_size(0);
+    uint r_group = get_global_id(0) / get_local_size(0);
+    uint r_groupSize = get_global_size(0) / get_local_size(0);
 
     __local float4 l_X[LOCAL_SIZE];
     __local float4 l_Y[LOCAL_SIZE];
@@ -146,14 +18,13 @@ __kernel void nbody_aos4(__global struct point* g_points)
     float4 r_rY[PRIVATE_SIZE];
     float4 r_rZ[PRIVATE_SIZE];
 
-    for( uint r_k=0; r_k<c_N4/(LOCAL_SIZE*get_global_size(0) / get_local_size(0)); r_k++)
+    for( uint r_k=0; r_k<c_N4/(LOCAL_SIZE*r_groupSize); r_k++)
     {
         r_rX[0] = r_rX[1] = r_rX[2] = r_rX[3] = 0.0f;
         r_rY[0] = r_rY[1] = r_rY[2] = r_rY[3] = 0.0f;
         r_rZ[0] = r_rZ[1] = r_rZ[2] = r_rZ[3] = 0.0f;
 
-        //uint r_offset = LOCAL_SIZE*r_group + r_k*r_groupSize*LOCAL_SIZE;
-        uint r_offset = LOCAL_SIZE*get_global_id(0)/get_local_size(0) + r_k*get_global_size(0) / get_local_size(0)*LOCAL_SIZE;
+        uint r_offset = LOCAL_SIZE*r_group + r_k*r_groupSize*LOCAL_SIZE;
 
         for( uint r_i=get_local_id(0); r_i < LOCAL_SIZE; r_i+=get_local_size(0))
         {
@@ -203,36 +74,6 @@ __kernel void nbody_aos4(__global struct point* g_points)
         for( uint r_j=0; r_j<c_N; r_j++)
         {
             float4 r_current = g_points[r_j].positionMass;
-
-            /*{
-            //r_rX[0] += rsqrt(l_X[get_local_id(0)] - r_current.x);
-            //r_rY[0] += rsqrt(l_Y[get_local_id(0)] - r_current.y);
-            //r_rZ[0] += rsqrt(l_Z[get_local_id(0)] - r_current.z);
-
-                float4 r_dx = l_X[get_local_id(0)] - r_current.x;
-                float4 r_dy = l_Y[get_local_id(0)] - r_current.y;
-                float4 r_dz = l_Z[get_local_id(0)] - r_current.z;
-
-                float4 r_dist_sq = (r_dx*r_dx + r_dy*r_dy + r_dz*r_dz + c_Epsilon);
-
-                r_rX[0] += r_dx * r_dist_sq;
-                r_rY[0] += r_dy * r_dist_sq;
-                r_rZ[0] += r_dz * r_dist_sq;
-            }
-
-            r_rX[1] += rsqrt(l_X[get_local_size(0)+get_local_id(0)] - (r_current.x));
-            r_rY[1] += rsqrt(l_Y[get_local_size(0)+get_local_id(0)] - (r_current.y));
-            r_rZ[1] += rsqrt(l_Z[get_local_size(0)+get_local_id(0)] - (r_current.z));
-
-            r_rX[2] += rsqrt(l_X[2*get_local_size(0)+get_local_id(0)] - (r_current.x));
-            r_rY[2] += rsqrt(l_Y[2*get_local_size(0)+get_local_id(0)] - (r_current.y));
-            r_rZ[2] += rsqrt(l_Z[2*get_local_size(0)+get_local_id(0)] - (r_current.z));
-
-            r_rX[3] += rsqrt(l_X[3*get_local_size(0)+get_local_id(0)] - (r_current.x));
-            r_rY[3] += rsqrt(l_Y[3*get_local_size(0)+get_local_id(0)] - (r_current.y));
-            r_rZ[3] += rsqrt(l_Z[3*get_local_size(0)+get_local_id(0)] - (r_current.z));*/
-
-
             {
                 float4 r_dx = l_X[get_local_id(0)] - r_current.x;
                 float4 r_dy = l_Y[get_local_id(0)] - r_current.y;
@@ -349,4 +190,5 @@ __kernel void nbody_aos4(__global struct point* g_points)
         }
     }
 }
+
 

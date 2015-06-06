@@ -3,7 +3,7 @@
 __constant const uint PRIVATE_SIZE = 4;
 
 
-__kernel void nbody_withSharedMem( __global float* g_X,  __global float* g_Y,  __global float* g_Z,
+__kernel void nbody_withSharedMem2( __global float* g_X,  __global float* g_Y,  __global float* g_Z,
                                    __global float* g_oX, __global float* g_oY, __global float* g_oZ,
                                    __global float* g_nX, __global float* g_nY, __global float* g_nZ,
                                    __global float* g_m )
@@ -21,7 +21,6 @@ __kernel void nbody_withSharedMem( __global float* g_X,  __global float* g_Y,  _
     float l_rY[PRIVATE_SIZE];
     float l_rZ[PRIVATE_SIZE];
 
-    //for( uint r_offset=get_global_id(0); r_offset<c_N; r_offset+=LOCAL_SIZE*get_global_size(0)) 
     for( uint r_k=0; r_k<c_N/(PRIVATE_SIZE*get_global_size(0)); r_k++)
     {
         
